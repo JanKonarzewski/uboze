@@ -2,14 +2,11 @@ package pl.konarzewski.uboze.ui.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.room.Room
 import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING
 import pl.konarzewski.uboze.R
 import pl.konarzewski.uboze.adapter.WordListAdapter
 import pl.konarzewski.uboze.database.AppDatabase

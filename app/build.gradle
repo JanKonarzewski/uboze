@@ -38,11 +38,15 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 apply plugin: "kotlin-kapt"
 
 dependencies {
+
 
     //Room
     def room_version = "2.3.0"

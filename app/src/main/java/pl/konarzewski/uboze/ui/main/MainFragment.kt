@@ -5,17 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.room.Room
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import pl.konarzewski.uboze.R
-import pl.konarzewski.uboze.adapter.WordListAdapter
-import pl.konarzewski.uboze.database.AppDatabase
-
 
 class MainFragment : Fragment() {
 
-    private lateinit var wordListAdapter: WordListAdapter
     private lateinit var viewPager: ViewPager2
+    private lateinit var engine: Engine
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,14 +23,21 @@ class MainFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val db = Room.databaseBuilder(
-            requireContext()!!.applicationContext,
-            AppDatabase::class.java,
-            "uboze_db_2.db" //uboze-db.db uboze_db_1.db
-        ).allowMainThreadQueries().build()
+        engine = Engine(requireContext()!!.applicationContext)
 
-        wordListAdapter = WordListAdapter(this, db!!)
         viewPager = view.findViewById(R.id.pager)
-        viewPager.adapter = wordListAdapter
+
+        viewPager.adapter = object : FragmentStateAdapter(this) {
+            override fun getItemCount(): Int = engine.size()
+
+            override fun createFragment(position: Int): Fragment {
+
+                val fragment = WordItemFragment()
+
+                val i = engine.getImige(position).path
+                fragment.arguments = Bundle().apply { putString("dir", i) }
+                return fragment
+            }
+        }
     }
 }

@@ -1,21 +1,20 @@
-package pl.konarzewski.uboze.adapter
+package pl.konarzewski.uboze.ui.main
 
-import android.os.Bundle
+import android.content.Context
 import android.os.Environment
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.room.Room
 import org.joda.time.DateTime
 import pl.konarzewski.uboze.dao.ImigeDao
 import pl.konarzewski.uboze.database.AppDatabase
 import pl.konarzewski.uboze.entity.Imige
-import pl.konarzewski.uboze.ui.main.WordItemFragment
 import java.io.File
 
-class WordListAdapter(fragment: Fragment, db: AppDatabase) : FragmentStateAdapter(fragment) {
+class Engine(ctx: Context) {
 
     private var images: List<Imige>
     private val imigeDao: ImigeDao
     private val currDate: DateTime = DateTime()
+    private val db: AppDatabase
     val dateToRepeat = mapOf(
         1 to 1,
         2 to 2,
@@ -26,6 +25,12 @@ class WordListAdapter(fragment: Fragment, db: AppDatabase) : FragmentStateAdapte
 
     init {
 
+        db = Room.databaseBuilder(
+            ctx,
+            AppDatabase::class.java,
+            "uboze_db_22.db" //uboze-db.db uboze_db_1.db
+        ).allowMainThreadQueries().build()
+
         val path = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
         val directory = File(path)
         imigeDao = db.imigeDao()
@@ -33,7 +38,7 @@ class WordListAdapter(fragment: Fragment, db: AppDatabase) : FragmentStateAdapte
         val databaseImiges = imigeDao.getAll()
         val except = internalFiles.filter { internalImige ->
             databaseImiges.find { databaseImige ->
-                databaseImige.path.equals(internalImige.path)
+                databaseImige.path == internalImige.path
             } == null
         }
         val intersect = databaseImiges.filter { databaseImige ->
@@ -42,30 +47,45 @@ class WordListAdapter(fragment: Fragment, db: AppDatabase) : FragmentStateAdapte
             } != null
         }
         val imigesForToday = getImigesForToday(intersect)
-        val exceptSorted = except.sortedByDescending { it.lastModified()}
+        val exceptSorted = except.sortedByDescending { it.lastModified() }
         val newFiles = exceptSorted.take(100 - imigesForToday.size)
         val newImiges = newFiles.map { file -> Imige(file.path, null, null) }
 
-        images = imigesForToday.plus(newImiges)
+        images = imigesForToday.plus(newImiges).plus(Imige("", null, null))
+    }
+
+    fun size(): Int {
+        return images.size
+    }
+
+    fun getImige(position: Int): Imige {
+        if (position > 1) {
+            val prevImige = images.get(position - 2)
+            if (isImigeForToday(prevImige))
+                updateImige(prevImige)
+        }
+        return images.get(position)
+    }
+
+    fun updateImige(imige: Imige) {
+        imige.rep_no = imige.rep_no?.plus(1) ?: 1
+        imige.last_rep_date = DateTime()
+        imigeDao.insert(imige)
     }
 
     private fun getImigesForToday(imiges: List<Imige>): List<Imige> {
-        val shitedCurrDate = currDate.minusHours(6).toLocalDate()
 
         return imiges.filter { imige ->
-            !imige.last_rep_date!!.plusDays(dateToRepeat.get(imige.rep_no)!!).minusHours(6).toLocalDate().isAfter(shitedCurrDate)
+            isImigeForToday(imige)
         }
     }
 
-    override fun getItemCount(): Int = images.size
-
-    override fun createFragment(position: Int): Fragment {
-        val fragment = WordItemFragment()
-        val imige = images.get(position)
-        imige.rep_no = imige.rep_no?.plus(1) ?: 1
-        imige.last_rep_date = DateTime()
-        fragment.arguments = Bundle().apply { putString("dir", imige.path) }
-        imigeDao.insert(imige)
-        return fragment
+    private fun isImigeForToday(imige: Imige): Boolean {
+        val shitedCurrDate = currDate.minusHours(6).toLocalDate()
+        if(imige.rep_no != null && imige.last_rep_date != null)
+            return !imige.last_rep_date!!.plusDays(dateToRepeat.get(imige.rep_no)!!).minusHours(6).toLocalDate()
+                .isAfter(shitedCurrDate)
+        else
+            return true
     }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">uboze</string>
+    <string name="preference_file_key">uboze_application_state</string>
 </resources>

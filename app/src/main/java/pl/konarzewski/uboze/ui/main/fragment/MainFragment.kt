@@ -47,6 +47,8 @@ class MainFragment : Fragment() {
         viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                if (position > 0)
+                    engine.updateImige(position - 1)
                 setState(position)
             }
         })

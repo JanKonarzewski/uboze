@@ -1,7 +1,7 @@
-package pl.konarzewski.uboze.dao
+package pl.konarzewski.uboze.database.dao
 
 import androidx.room.*
-import pl.konarzewski.uboze.entity.Imige
+import pl.konarzewski.uboze.database.entity.Imige
 
 @Dao
 interface ImigeDao {

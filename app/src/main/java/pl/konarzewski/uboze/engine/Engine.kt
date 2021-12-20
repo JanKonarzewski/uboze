@@ -1,12 +1,12 @@
-package pl.konarzewski.uboze.ui.main
+package pl.konarzewski.uboze.engine
 
 import android.content.Context
 import android.os.Environment
 import androidx.room.Room
 import org.joda.time.DateTime
-import pl.konarzewski.uboze.dao.ImigeDao
+import pl.konarzewski.uboze.database.dao.ImigeDao
 import pl.konarzewski.uboze.database.AppDatabase
-import pl.konarzewski.uboze.entity.Imige
+import pl.konarzewski.uboze.database.entity.Imige
 import java.io.File
 
 class Engine(ctx: Context) {
@@ -28,7 +28,7 @@ class Engine(ctx: Context) {
         db = Room.databaseBuilder(
             ctx,
             AppDatabase::class.java,
-            "uboze_db_22.db" //uboze-db.db uboze_db_1.db
+            "uboze_app_database.db"
         ).allowMainThreadQueries().build()
 
         val path = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"

@@ -1,13 +1,12 @@
-package pl.konarzewski.uboze.ui.main
+package pl.konarzewski.uboze.ui.main.fragment
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import pl.konarzewski.uboze.R
+import pl.konarzewski.uboze.engine.Engine
 
 class MainFragment : Fragment() {
 
@@ -24,7 +23,6 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         engine = Engine(requireContext()!!.applicationContext)
-
         viewPager = view.findViewById(R.id.pager)
 
         viewPager.adapter = object : FragmentStateAdapter(this) {
@@ -39,5 +37,13 @@ class MainFragment : Fragment() {
                 return fragment
             }
         }
+    }
+
+    override fun onStart() {
+        requireActivity().getWindow().getDecorView().setSystemUiVisibility(
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        )
+        super.onStart()
     }
 }

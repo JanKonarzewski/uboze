@@ -1,11 +1,11 @@
-package pl.konarzewski.uboze.entity
+package pl.konarzewski.uboze.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import org.joda.time.DateTime
-import pl.konarzewski.uboze.conventer.DateTimeConverter
+import pl.konarzewski.uboze.database.conventer.DateTimeConverter
 
 @Entity
 @TypeConverters(

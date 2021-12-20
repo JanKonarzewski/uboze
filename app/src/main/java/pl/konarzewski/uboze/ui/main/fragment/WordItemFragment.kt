@@ -1,4 +1,4 @@
-package pl.konarzewski.uboze.ui.main
+package pl.konarzewski.uboze.ui.main.fragment
 
 import android.graphics.BitmapFactory
 import android.os.Bundle

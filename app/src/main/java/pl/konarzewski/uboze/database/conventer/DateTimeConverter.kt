@@ -1,4 +1,4 @@
-package pl.konarzewski.uboze.conventer
+package pl.konarzewski.uboze.database.conventer
 
 import androidx.room.TypeConverter
 import org.joda.time.DateTime

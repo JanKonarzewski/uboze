@@ -1,4 +1,4 @@
-package pl.konarzewski.uboze.ui.main
+package pl.konarzewski.uboze.ui.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 

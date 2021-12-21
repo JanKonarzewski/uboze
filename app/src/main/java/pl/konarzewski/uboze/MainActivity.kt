@@ -22,4 +22,9 @@ class MainActivity : AppCompatActivity() {
 
          */
     }
+
+    override fun onDestroy() {
+        AppDatabase.destroyInstance()
+        super.onDestroy()
+    }
 }

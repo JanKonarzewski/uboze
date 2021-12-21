@@ -27,11 +27,7 @@ class Engine(ctx: Context) {
 
     init {
 
-        db = Room.databaseBuilder(
-            ctx,
-            AppDatabase::class.java,
-            "uboze_application_database.db"
-        ).allowMainThreadQueries().build()
+        db = AppDatabase.getInstance(ctx)
 
         val path = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
         val directory = File(path)

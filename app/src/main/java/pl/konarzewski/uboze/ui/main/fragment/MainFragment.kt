@@ -9,6 +9,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import org.joda.time.DateTime
 import pl.konarzewski.uboze.R
+import pl.konarzewski.uboze.database.AppDatabase
 import pl.konarzewski.uboze.engine.Engine
 
 class MainFragment : Fragment() {
@@ -64,6 +65,17 @@ class MainFragment : Fragment() {
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         )
         super.onStart()
+    }
+
+    override fun onDestroyView() {
+        AppDatabase.destroyInstance()
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        AppDatabase.destroyInstance()
+        super.onDestroy()
+
     }
 
     fun setState(page: Int) {

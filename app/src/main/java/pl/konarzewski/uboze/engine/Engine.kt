@@ -50,8 +50,7 @@ class Engine(ctx: Context) {
         val newImigesNotFromToday = except.filter { imige -> !DateTime(imige.lastModified()).minusHours(6).toLocalDate().isEqual(shiftedCurrDate) }.map { file -> Imige(file.path, null, null) }
         val newImigesFromTodaySorted = newImigesFromToday.sortedByDescending { it.path }
         val newImigesNotFromTodaySorted = newImigesNotFromToday.sortedByDescending { it.path }
-        val newImigesNotFromTodaySortedNLatest =
-            newImigesNotFromTodaySorted.take(120 - imigesToBeRepToday.size + imigesRepToday.size + newImigesFromTodaySorted.size)
+        val newImigesNotFromTodaySortedNLatest = newImigesNotFromTodaySorted.take(100)
         val emptyEndingImige = Imige("", null, null)
 
         images = imigesRepToday.plus(newImigesFromTodaySorted.plus(imigesToBeRepToday.plus(newImigesNotFromTodaySortedNLatest.plus(emptyEndingImige))))

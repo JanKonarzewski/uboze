@@ -1,19 +1,18 @@
 package pl.konarzewski.uboze.database.dao
 
 import androidx.room.*
+import org.joda.time.DateTime
+import pl.konarzewski.uboze.database.conventer.DateTimeConverter
 import pl.konarzewski.uboze.database.entity.Imige
 
 @Dao
-interface ImigeDao {
+@TypeConverters(DateTimeConverter::class)
+interface ImigeDao( ) {
     @Query("SELECT * FROM Imige")
     fun getAll(): List<Imige>
 
     @Query("SELECT * FROM Imige WHERE path IN (:ImigeIds)")
     fun loadAllByIds(ImigeIds: IntArray): List<Imige>
-
-    //@Query("SELECT * FROM Imige WHERE first_name LIKE :first AND " +
-      //      "last_name LIKE :last LIMIT 1")
-    //fun findByName(first: String, last: String): Imige
 
     @Insert
     fun insertAll(vararg Imiges: Imige)
@@ -24,5 +23,9 @@ interface ImigeDao {
     @Delete
     fun delete(Imige: Imige)
 
+    @Query("SELECT * FROM Imige WHERE path = :path")
+    fun findById(path: String): Imige
 
+    @Query("UPDATE Imige SET repetition_number = repetition_number + 1, last_repetition_date = :date WHERE path = :path")
+    fun increment(path: String, date: DateTime = DateTime())
 }

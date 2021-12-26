@@ -8,16 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import org.joda.time.DateTime
+import org.joda.time.DateTimeFieldType
 import pl.konarzewski.uboze.R
 import pl.konarzewski.uboze.database.AppDatabase
-import pl.konarzewski.uboze.engine.Engine
+import pl.konarzewski.uboze.ui.main.adapter.ScreenSlidePagerAdapter
+import pl.konarzewski.uboze.ui.main.viewmodel.MainViewModel
 
 class MainFragment : Fragment() {
 
     private lateinit var viewPager: ViewPager2
-    private lateinit var engine: Engine
     private lateinit var sharedPref: SharedPreferences
-
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,35 +29,37 @@ class MainFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        viewModel = MainViewModel(requireContext()!!.applicationContext)
+
         sharedPref = activity?.getSharedPreferences(
             getString(R.string.preference_file_key), Context.MODE_PRIVATE)!!
 
-        engine = Engine(requireContext()!!.applicationContext)
+
         viewPager = view.findViewById(R.id.pager)
 
-        viewPager.adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount(): Int = engine.size()
-
-            override fun createFragment(position: Int): Fragment {
-                val fragment = WordItemFragment()
-
-                fragment.arguments = Bundle().apply { putString("dir", engine.getImige(position).path) }
-                return fragment
-            }
-        }
+        viewPager.adapter = ScreenSlidePagerAdapter(this, viewModel)
 
         viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 if (position > 0)
-                    engine.updateImige(position - 1)
+                    viewModel.repeat(position - 1)
                 setState(position)
             }
         })
 
-        if (getStateTimestamp().minusHours(6).toLocalDate().isEqual(DateTime().minusHours(6).toLocalDate())) {
+        if (getStateTimestamp().minusHours(6).toLocalDate().isEqual(DateTime().minusHours(6).toLocalDate()))
             viewPager.setCurrentItem(getState())
-        }
+        else
+            if (DateTime().get(DateTimeFieldType.hourOfDay()) < 23)
+                try {
+                    viewPager.setCurrentItem(engine.getPositionOfNewImiges())
+                } catch (e:Exception) {
+                    val a=e.printStackTrace()
+                    val v = 1
+                }
+            else viewPager.setCurrentItem(0)
     }
 
     override fun onStart() {

@@ -47,6 +47,8 @@ apply plugin: "kotlin-kapt"
 
 dependencies {
 
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'com.yuyakaido.android:card-stack-view:2.3.4'
 
     //Room
     def room_version = "2.3.0"
@@ -55,6 +57,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
     kapt "androidx.room:room-compiler:$room_version"
+    kapt 'com.yuyakaido.android:card-stack-view:2.3.4'
     //Room - End
 
     //view pager

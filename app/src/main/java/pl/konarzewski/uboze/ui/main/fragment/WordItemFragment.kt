@@ -9,16 +9,14 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import pl.konarzewski.uboze.R
 
-class WordItemFragment : Fragment() {
+class WordItemFragment(private val path: String) : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.word_item, container, false)
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.word_item, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        arguments?.takeIf { it.containsKey("dir") }?.apply {
-            val imageView: ImageView = view.findViewById(R.id.image_place_holder)
-            imageView.setImageBitmap(BitmapFactory.decodeFile(getString("dir")));
-        }
-    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) =
+        (view.findViewById(R.id.image_place_holder) as ImageView)
+            .setImageBitmap(BitmapFactory.decodeFile(path))
+
 }

@@ -2,7 +2,6 @@ package pl.konarzewski.uboze.engine
 
 import android.content.Context
 import android.os.Environment
-import androidx.room.Room
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
 import pl.konarzewski.uboze.database.dao.ImigeDao
@@ -12,11 +11,8 @@ import java.io.File
 
 class Engine(ctx: Context) {
 
-    private var images: List<Imige>
-    private val imigeDao: ImigeDao
-    private val shift: Int = 6
-    private val shiftedCurrDate: LocalDate = DateTime().minusHours(shift).toLocalDate()
-    private val db: AppDatabase
+    private val db: AppDatabase = AppDatabase.getInstance(ctx)
+    private val imigeDao: ImigeDao = db.imigeDao()
     val dateToRepeat = mapOf(
         1 to 1,
         2 to 2,
@@ -25,13 +21,11 @@ class Engine(ctx: Context) {
         5 to 14
     )
 
-    init {
+    fun getPaths(): List<String> {
 
-        db = AppDatabase.getInstance(ctx)
-
+        val shiftedCurrDate = DateTime().shiftToDate()
         val path = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
         val directory = File(path)
-        imigeDao = db.imigeDao()
         val internalFiles = directory.listFiles()
         val databaseImiges = imigeDao.getAll()
         val except = internalFiles.filter { internalImige ->
@@ -41,56 +35,58 @@ class Engine(ctx: Context) {
         }
         val intersect = databaseImiges.filter { databaseImige ->
             internalFiles.find { internalImige ->
-                internalImige.path.equals(databaseImige.path)
+                internalImige.path == databaseImige.path
             } != null
         }
-        val imigesToBeRepToday = getImigesToBeRepToday(intersect).sortedByDescending { it.path }
-        val imigesRepToday = intersect.filter { imige -> imige.last_rep_date!!.minusHours(shift).toLocalDate().isEqual(shiftedCurrDate) }.sortedByDescending { it.path }
-        val newImigesFromToday = except.filter { imige -> DateTime(imige.lastModified()).minusHours(6).toLocalDate().isEqual(shiftedCurrDate) }.map { file -> Imige(file.path, null, null) }
-        val newImigesNotFromToday = except.filter { imige -> !DateTime(imige.lastModified()).minusHours(6).toLocalDate().isEqual(shiftedCurrDate) }.map { file -> Imige(file.path, null, null) }
+        val imigesToBeRepToday = getImigesToBeRepToday(intersect, DateTime()).sortedByDescending { it.path }
+        val imigesRepToday =
+            intersect.filter { imige -> imige.last_rep_date!!.shiftToDate() == shiftedCurrDate }
+                .sortedByDescending { it.path }
+        val newImigesFromToday = except.filter { imige ->
+            (DateTime(imige.lastModified()).minusHours(6).toLocalDate() == shiftedCurrDate)
+        }.map { file -> Imige(file.path, null, null) }
+        val newImigesNotFromToday = except.filter { imige ->
+            !(DateTime(imige.lastModified()).minusHours(6).toLocalDate() == shiftedCurrDate)
+        }.map { file -> Imige(file.path, null, null) }
         val newImigesFromTodaySorted = newImigesFromToday.sortedByDescending { it.path }
         val newImigesNotFromTodaySorted = newImigesNotFromToday.sortedByDescending { it.path }
         val emptyEndingImige = Imige("null", null, null)
 
-        images = imigesRepToday.plus(newImigesFromTodaySorted.plus(imigesToBeRepToday.plus(emptyEndingImige).plus(newImigesNotFromTodaySorted.plus(emptyEndingImige))))
-    }
-
-    fun size(): Int {
-        return images.size
-    }
-
-    fun getImige(position: Int): Imige {
-        return images.get(position)
-    }
-
-    fun updateImige(position: Int) {
-        val imige = images.get(position)
-
-        if (imige.last_rep_date == null ||
-            imige.rep_no == null ||
-            !imige.last_rep_date!!.minusHours(shift).toLocalDate().isEqual(shiftedCurrDate)
+        return imigesRepToday.plus(
+            newImigesFromTodaySorted.plus(
+                imigesToBeRepToday.plus(
+                    emptyEndingImige
+                )
+            )
         )
-            increment(imige)
+            .map { imige -> imige.path }
     }
 
-    private fun increment(imige: Imige) {
-        imige.rep_no = imige.rep_no?.plus(1) ?: 1
-        imige.last_rep_date = DateTime()
-        imigeDao.insert(imige)
-    }
-
-    private fun getImigesToBeRepToday(imiges: List<Imige>): List<Imige> {
+    private fun getImigesToBeRepToday(imiges: List<Imige>, date: DateTime): List<Imige> {
         return imiges.filter { imige ->
-            isImigeForToday(imige)
+            isImigeForToday(imige, date)
         }
     }
 
-    private fun isImigeForToday(imige: Imige): Boolean {
-        return !getNextRepDate(imige).isAfter(shiftedCurrDate)
+    private fun isImigeForToday(imige: Imige, date: DateTime): Boolean {
+        return !getNextRepDate(imige).isAfter(date.shiftToDate())
     }
 
     private fun getNextRepDate(imige: Imige): LocalDate {
-        return imige.last_rep_date!!.minusHours(shift).toLocalDate().plusDays(dateToRepeat.get(imige.rep_no)!!)
+        return imige.last_rep_date!!.shiftToDate().plusDays(dateToRepeat.get(imige.rep_no)!!)
     }
 
+    fun repeat(path: String) {
+        val imige = imigeDao.findById(path)
+
+        if (imige == null)
+            imigeDao.init(path)
+        else if (!(imige.last_rep_date!!.shiftToDate() == DateTime().shiftToDate()))
+            imigeDao.increment(path)
+    }
+
+    companion object {
+        fun DateTime.shiftToDate(shift: Int = 6): LocalDate =
+            this.minusHours(shift).toLocalDate()
+    }
 }

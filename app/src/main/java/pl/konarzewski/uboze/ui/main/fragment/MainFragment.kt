@@ -11,11 +11,11 @@ import org.joda.time.DateTime
 import pl.konarzewski.uboze.R
 import pl.konarzewski.uboze.database.AppDatabase
 import pl.konarzewski.uboze.engine.Engine
+import pl.konarzewski.uboze.engine.Engine.Companion.shiftToDate
 
 class MainFragment : Fragment() {
 
     private lateinit var viewPager: ViewPager2
-    private lateinit var engine: Engine
     private lateinit var sharedPref: SharedPreferences
 
 
@@ -23,38 +23,34 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.main_fragment, container, false)
-    }
+    ): View? = inflater.inflate(R.layout.main_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        sharedPref = activity?.getSharedPreferences(
-            getString(R.string.preference_file_key), Context.MODE_PRIVATE)!!
 
-        engine = Engine(requireContext()!!.applicationContext)
+        sharedPref =
+            activity?.getSharedPreferences("uboze_application_state", Context.MODE_PRIVATE)!!
+
+        val engine = Engine(requireContext()!!.applicationContext)
+
         viewPager = view.findViewById(R.id.pager)
+        val paths = engine.getPaths()
 
         viewPager.adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount(): Int = engine.size()
+            override fun getItemCount(): Int = paths.size
 
-            override fun createFragment(position: Int): Fragment {
-                val fragment = WordItemFragment()
-
-                fragment.arguments = Bundle().apply { putString("dir", engine.getImige(position).path) }
-                return fragment
-            }
+            override fun createFragment(n: Int): Fragment = WordItemFragment(paths[n])
         }
 
-        viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 if (position > 0)
-                    engine.updateImige(position - 1)
+                    engine.repeat(paths[position])
                 setState(position)
             }
         })
 
-        if (getStateTimestamp().minusHours(6).toLocalDate().isEqual(DateTime().minusHours(6).toLocalDate())) {
+        if (getStateTimestamp().shiftToDate() == DateTime().shiftToDate()) {
             viewPager.setCurrentItem(getState())
         }
     }
@@ -75,21 +71,20 @@ class MainFragment : Fragment() {
     override fun onDestroy() {
         AppDatabase.destroyInstance()
         super.onDestroy()
-
     }
 
-    fun setState(page: Int) {
-        val editor = sharedPref!!.edit()
-        editor.putInt("page", page)
-        editor.putLong("timestamp_of_page", DateTime().millis)
-        editor.commit()
-    }
+    fun setState(page: Int) =
+        sharedPref!!.edit()
+            .putInt("page", page)
+            .putLong("timestamp_of_page", DateTime().millis)
+            .commit()
 
-    fun getState(): Int {
-        return sharedPref!!.getInt("page", 1)
-    }
+    fun getState(): Int =
+        sharedPref!!
+            .getInt("page", 1)
 
-    fun getStateTimestamp(): DateTime {
-        return sharedPref!!.getLong("timestamp_of_page", 0L)?.let { DateTime(it) }
-    }
+    fun getStateTimestamp(): DateTime =
+        sharedPref!!
+            .getLong("timestamp_of_page", 0L)?.let { DateTime(it) }
+
 }

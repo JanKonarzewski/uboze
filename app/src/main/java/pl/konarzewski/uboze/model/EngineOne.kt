@@ -27,33 +27,34 @@ fun getInteralFiles(path: String): Array<File> =
 fun getInteralImigesFromToday(files: Array<File>, currDate: DateTime): List<Imige> =
     files
         .filter { file -> DateTime(file.lastModified()).shiftToDate() == currDate.shiftToDate() }
-        .map { file -> Imige(file.path, null, null)}
+        .map { file -> Imige(file.path, null, null) }
 
 fun getInteralImigesNotFromToday(files: Array<File>, currDate: DateTime): List<Imige> =
     files
         .filter { file -> DateTime(file.lastModified()).shiftToDate() != currDate.shiftToDate() }
-        .map { file -> Imige(file.path, null, null)}
+        .map { file -> Imige(file.path, null, null) }
 
 fun getDatabaseImiges(db: AppDatabase): List<Imige> = db.imigeDao().getAll()
 
 // Operate
 fun exceptByPath(a: List<Imige>, b: List<Imige>): List<Imige> =
-    a.filter {
-            internalImige -> b.find {
-            databaseImige -> databaseImige.path == internalImige.path
-    } == null
+    a.filter { internalImige ->
+        b.find { databaseImige ->
+            databaseImige.path == internalImige.path
+        } == null
     }.map { imige -> Imige(imige.path, null, null) }
 
 fun intersectByPath(a: List<Imige>, b: List<Imige>): List<Imige> = //filterNotAvailableImiges
-    a.filter {
-            databaseImige -> b.find {
-            internalImige -> internalImige.path == databaseImige.path
-    } != null
+    a.filter { databaseImige ->
+        b.find { internalImige ->
+            internalImige.path == databaseImige.path
+        } != null
     }
 
 fun getPathsToRepeat(intersect: List<Imige>, currDate: DateTime): List<String> =
     intersect.filter { imige ->
-        isImigeForToday(imige, currDate)}
+        isImigeForToday(imige, currDate)
+    }
         .map { imige -> imige.path }
         .sorted()
 
@@ -67,7 +68,7 @@ private fun getNextRepDate(imige: Imige): LocalDate {
 
 // Modify operations on DB
 fun initPaths(paths: List<Imige>, db: AppDatabase) =
-    paths.forEach {imige -> db.imigeDao().init(imige.path)}
+    paths.forEach { imige -> db.imigeDao().init(imige.path) }
 
 fun repeat(path: String, db: AppDatabase) {
     val imgDao = db.imigeDao()

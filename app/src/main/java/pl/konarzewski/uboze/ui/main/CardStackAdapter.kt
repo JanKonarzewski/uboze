@@ -7,11 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yuyakaido.android.cardstackview.*
 import pl.konarzewski.uboze.R
 
-fun getConfiguredCardStackManager(ctx: Context, swipe: (Int)-> Unit): CardStackLayoutManager {
+fun getConfiguredCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLayoutManager {
     val manager = getCardStackManager(ctx, swipe)
     manager.setStackFrom(StackFrom.None)
     manager.setVisibleCount(3)
@@ -26,7 +27,7 @@ fun getConfiguredCardStackManager(ctx: Context, swipe: (Int)-> Unit): CardStackL
     return manager
 }
 
-private fun getCardStackManager(ctx: Context, swipe: (Int)-> Unit): CardStackLayoutManager =
+private fun getCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLayoutManager =
     CardStackLayoutManager(ctx, object : CardStackListener {
         override fun onCardDragging(direction: Direction?, ratio: Float) {}
 
@@ -42,24 +43,28 @@ private fun getCardStackManager(ctx: Context, swipe: (Int)-> Unit): CardStackLay
             swipe(position)
     })
 
-class CardStackAdapter(private val paths: List<String>): RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
+class CardStackAdapter(private val paths: List<String>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.word_item, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-        holder.setData(paths[position])
+        holder.setData(paths[position], (paths.size - position).toString())
 
     override fun getItemCount(): Int = paths.size
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var image: ImageView
+        var counter: TextView
 
         init {
             image = view.findViewById(R.id.image_place_holder)
+            counter = view.findViewById(R.id.counter)
         }
 
-        fun setData(path: String) =
+        fun setData(path: String, overlayText: String) {
             image.setImageBitmap(BitmapFactory.decodeFile(path))
+            counter.text = overlayText
+        }
     }
 }

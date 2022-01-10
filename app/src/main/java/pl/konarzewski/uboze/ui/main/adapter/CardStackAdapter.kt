@@ -8,7 +8,7 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import pl.konarzewski.uboze.R
 
-class CardStackAdapter(private val paths: List<String>): RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
+class CardStackAdapter(private val paths: List<String>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardStackAdapter.ViewHolder =
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.word_item, parent, false))

@@ -38,7 +38,10 @@ class MainFragment : Fragment() {
         val paths = getPathsToRepeat(intersect, currDateTime)
 
         cardStackView = view.findViewById(R.id.card_stack_view)
-        cardStackView.layoutManager = getConfiguredCardStackManager(ctx) { position -> repeat(paths[position], db)}
+        cardStackView.layoutManager = getConfiguredCardStackManager(ctx) { position ->
+            repeat(paths[position], db)
+        }
+        cardStackView
         cardStackView.adapter = CardStackAdapter(paths)
         cardStackView.itemAnimator = DefaultItemAnimator()
     }

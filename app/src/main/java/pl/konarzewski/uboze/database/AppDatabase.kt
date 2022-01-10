@@ -13,7 +13,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
 
-        @Volatile private var INSTANCE: AppDatabase? = null
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
 
         fun getInstance(ctx: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
@@ -26,7 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
             Room.databaseBuilder(
                 ctx,
                 AppDatabase::class.java,
-                "uboze_application_database.db"
+                "uboze_application_database_test2.db"
             ).allowMainThreadQueries().build()
 
         fun destroyInstance() {
@@ -38,4 +39,3 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
-

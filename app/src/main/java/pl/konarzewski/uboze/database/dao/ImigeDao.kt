@@ -4,6 +4,7 @@ import androidx.room.*
 import org.joda.time.DateTime
 import pl.konarzewski.uboze.database.conventer.DateTimeConverter
 import pl.konarzewski.uboze.database.entity.Imige
+import pl.konarzewski.uboze.model.isImigeForToday
 
 @Dao
 @TypeConverters(DateTimeConverter::class)
@@ -20,4 +21,7 @@ interface ImigeDao {
 
     @Query("UPDATE Imige SET repetition_number = repetition_number + 1, last_repetition_date = :date WHERE path = :path")
     fun increment(path: String, date: DateTime = DateTime())
+
+    @Query("SELECT EXISTS(SELECT * FROM Imige WHERE path = :path)")
+    fun exist(path: String) : Boolean
 }

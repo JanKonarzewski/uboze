@@ -27,7 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
             Room.databaseBuilder(
                 ctx,
                 AppDatabase::class.java,
-                "uboze_application_database_test2.db"
+                "uboze_application_database.db"
             ).allowMainThreadQueries().build()
 
         fun destroyInstance() {

@@ -51,12 +51,11 @@ fun intersectByPath(a: List<Imige>, b: List<Imige>): List<Imige> = //filterNotAv
         } != null
     }
 
-fun getPathsToRepeat(intersect: List<Imige>, currDate: DateTime): List<String> =
+fun getPathsToRepeat(intersect: List<Imige>, currDate: DateTime): List<Imige> =
     intersect.filter { imige ->
         isImigeForToday(imige, currDate)
     }
-        .map { imige -> imige.path }
-        .sorted()
+        .sortedBy { it.path }
 
 fun isImigeForToday(imige: Imige, date: DateTime): Boolean {
     return !getNextRepDate(imige).isAfter(date.shiftToDate())

@@ -35,14 +35,14 @@ class MainFragment : Fragment() {
         val databaseImages = getDatabaseImiges(db)
         val internalImagesCombined = internalImagesFromToday.plus(internalImagesNotFromToday)
         val intersect = intersectByPath(databaseImages, internalImagesCombined)
-        val paths = getPathsToRepeat(intersect, currDateTime)
+        val images = getPathsToRepeat(intersect, currDateTime)
 
         cardStackView = view.findViewById(R.id.card_stack_view)
         cardStackView.layoutManager = getConfiguredCardStackManager(ctx) { position ->
-            repeat(paths[position], db)
+            repeat(images[position].path, db)
         }
         cardStackView
-        cardStackView.adapter = CardStackAdapter(paths)
+        cardStackView.adapter = CardStackAdapter(images)
         cardStackView.itemAnimator = DefaultItemAnimator()
     }
 

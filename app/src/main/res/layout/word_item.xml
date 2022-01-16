@@ -33,4 +33,17 @@
         />
     </FrameLayout>
 
+    <FrameLayout android:id="@+id/bottom_overlay" android:layout_width="match_parent" android:layout_height="match_parent">
+        <TextView
+                android:id="@+id/rep_no"
+                android:text="-100"
+                android:gravity="center"
+                android:textColor="#7CFC00"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="150sp"
+                android:textColorLink="#000000"
+        />
+    </FrameLayout>
+
 </androidx.cardview.widget.CardView>

@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yuyakaido.android.cardstackview.*
 import pl.konarzewski.uboze.R
-import pl.konarzewski.uboze.database.entity.Imige
+import pl.konarzewski.uboze.database.entity.Image
 
 fun getConfiguredCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLayoutManager {
     val manager = getCardStackManager(ctx, swipe)
@@ -44,15 +44,15 @@ private fun getCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLa
             swipe(position)
     })
 
-class CardStackAdapter(private val imiges: List<Imige>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
+class CardStackAdapter(private val images: List<Image>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.word_item, parent, false))
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-        holder.setData(imiges[position])
+        holder.setData(images[position])
 
-    override fun getItemCount(): Int = imiges.size
+    override fun getItemCount(): Int = images.size
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var image: ImageView
@@ -65,10 +65,10 @@ class CardStackAdapter(private val imiges: List<Imige>) : RecyclerView.Adapter<C
             repNo = view.findViewById(R.id.rep_no)
         }
 
-        fun setData(imige: Imige) {
-            image.setImageBitmap(BitmapFactory.decodeFile(imige.path))
-            counter.text = (imiges.size - adapterPosition).toString()
-            repNo.text = (imige.rep_no?.plus(1)).toString()
+        fun setData(image: Image) {
+            this.image.setImageBitmap(BitmapFactory.decodeFile(image.path))
+            counter.text = (images.size - adapterPosition).toString()
+            repNo.text = (image.rep_no?.plus(1)).toString()
         }
     }
 }

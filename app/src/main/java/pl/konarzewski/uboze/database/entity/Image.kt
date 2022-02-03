@@ -1,16 +1,14 @@
 package pl.konarzewski.uboze.database.entity
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import org.joda.time.DateTime
 import pl.konarzewski.uboze.database.conventer.DateTimeConverter
 
 @Entity
 @TypeConverters(DateTimeConverter::class)
-data class Imige(
+data class Image(
     @PrimaryKey val path: String,
     @ColumnInfo(name = "repetition_number") val rep_no: Int?,
-    @ColumnInfo(name = "last_repetition_date") val last_rep_date: DateTime?
+    @ColumnInfo(name = "last_repetition_date") val last_rep_date: DateTime?,
+    @ColumnInfo(name = "last_modified") val last_modified: Long?
 )

@@ -3,11 +3,11 @@ package pl.konarzewski.uboze.model
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
 import pl.konarzewski.uboze.database.AppDatabase
-import pl.konarzewski.uboze.database.entity.Imige
+import pl.konarzewski.uboze.database.entity.Image
 import pl.konarzewski.uboze.model.EngineOne.Companion.shiftToDate
 import java.io.File
 
-val dateToRepeat = mapOf( //0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55,
+val dateToRepeat = mapOf( //0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55,89
     0 to 0,     //1
     1 to 1,     //2
     2 to 1,     //3
@@ -16,57 +16,59 @@ val dateToRepeat = mapOf( //0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55,
     5 to 5,     //13
     6 to 8,     //21
     7 to 13,    //34
-    8 to 21     //55
+    8 to 21,    //55
+    9 to 34,    //89
+    10 to 55,   //144
+    11 to 89    //233
 )
 
 // Retreve
-fun getInteralFiles(path: String): Array<File> =
+fun getInteralImiges(path: String): List<Image> =
     File(path)
         .listFiles()
+        .map { file -> Image(file.path, null, null, file.lastModified()) }
 
-fun getInteralImigesFromToday(files: Array<File>, currDate: DateTime): List<Imige> =
-    files
-        .filter { file -> DateTime(file.lastModified()).shiftToDate() == currDate.shiftToDate() }
-        .map { file -> Imige(file.path, null, null) }
+fun getInteralImigesFromToday(images: List<Image>, currDate: DateTime): List<Image> =
+    images
+        .filter { image -> DateTime(image.last_modified).shiftToDate() == currDate.shiftToDate() }
 
-fun getInteralImigesNotFromToday(files: Array<File>, currDate: DateTime): List<Imige> =
-    files
-        .filter { file -> DateTime(file.lastModified()).shiftToDate() != currDate.shiftToDate() }
-        .map { file -> Imige(file.path, null, null) }
+fun getInteralImigesNotFromToday(images: List<Image>, currDate: DateTime): List<Image> =
+    images
+        .filter { image -> DateTime(image.last_modified).shiftToDate() != currDate.shiftToDate() }
 
-fun getDatabaseImiges(db: AppDatabase): List<Imige> = db.imigeDao().getAll()
+fun getDatabaseImiges(db: AppDatabase): List<Image> = db.imigeDao().getAll()
 
 // Operate
-fun exceptByPath(a: List<Imige>, b: List<Imige>): List<Imige> =
+fun exceptByPath(a: List<Image>, b: List<Image>): List<Image> =
     a.filter { internalImige ->
         b.find { databaseImige ->
             databaseImige.path == internalImige.path
         } == null
-    }.map { imige -> Imige(imige.path, null, null) }
+    }
 
-fun intersectByPath(a: List<Imige>, b: List<Imige>): List<Imige> = //filterNotAvailableImiges
-    a.filter { databaseImige ->
-        b.find { internalImige ->
-            internalImige.path == databaseImige.path
+fun intersectByPath(a: List<Image>, b: List<Image>): List<Image> = //filterNotAvailableImiges
+    a.filter { databaseImage ->
+        b.find { internalImage ->
+            internalImage.path == databaseImage.path
         } != null
     }
 
-fun getPathsToRepeat(intersect: List<Imige>, currDate: DateTime): List<Imige> =
+
+fun getPathsToRepeat(intersect: List<Image>, currDate: DateTime): List<Image> =
     intersect.filter { imige ->
         isImigeForToday(imige, currDate)
-    }
-        .sortedBy { it.path }
+    }.sortedBy { it.last_modified }
 
-fun isImigeForToday(imige: Imige, date: DateTime): Boolean {
-    return !getNextRepDate(imige).isAfter(date.shiftToDate())
+fun isImigeForToday(image: Image, date: DateTime): Boolean {
+    return !getNextRepDate(image).isAfter(date.shiftToDate())
 }
 
-private fun getNextRepDate(imige: Imige): LocalDate {
-    return imige.last_rep_date!!.shiftToDate().plusDays(dateToRepeat[imige.rep_no]!!)
+private fun getNextRepDate(image: Image): LocalDate {
+    return image.last_rep_date!!.shiftToDate().plusDays(dateToRepeat[image.rep_no]!!)
 }
 
 // Modify operations on DB
-fun initPaths(paths: List<Imige>, db: AppDatabase) =
+fun initPaths(paths: List<Image>, db: AppDatabase) =
     paths.forEach { imige -> db.imigeDao().init(imige.path) }
 
 fun repeat(path: String, db: AppDatabase) {

@@ -25,16 +25,14 @@ class MainFragment : Fragment() {
         val currDateTime = DateTime()
         val db = AppDatabase.getInstance(ctx)
         val dcimScreenshotsPath = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
-        val internalFiles = getInteralFiles(dcimScreenshotsPath)
-        val internalImagesFromToday = getInteralImigesFromToday(internalFiles, currDateTime)
-        val internalImagesNotFromToday = getInteralImigesNotFromToday(internalFiles, currDateTime)
+        val internalImages = getInteralImiges(dcimScreenshotsPath)
+        val internalImagesFromToday = getInteralImigesFromToday(internalImages, currDateTime)
         val except = exceptByPath(internalImagesFromToday, getDatabaseImiges(db))
 
         initPaths(except, db)
 
         val databaseImages = getDatabaseImiges(db)
-        val internalImagesCombined = internalImagesFromToday.plus(internalImagesNotFromToday)
-        val intersect = intersectByPath(databaseImages, internalImagesCombined)
+        val intersect = intersectByPath(databaseImages, internalImages)
         val images = getPathsToRepeat(intersect, currDateTime)
 
         cardStackView = view.findViewById(R.id.card_stack_view)

@@ -26,7 +26,7 @@ val dateToRepeat = mapOf( //0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55,89
 fun getInteralImiges(path: String): List<Image> =
     File(path)
         .listFiles()
-        .map { file -> Image(file.path, null, null, file.lastModified()) }
+        .map { file -> Image(file.path, null, null, file.lastModified(), false) }
 
 fun getInteralImigesFromToday(images: List<Image>, currDate: DateTime): List<Image> =
     images
@@ -36,7 +36,7 @@ fun getInteralImigesNotFromToday(images: List<Image>, currDate: DateTime): List<
     images
         .filter { image -> DateTime(image.last_modified).shiftToDate() != currDate.shiftToDate() }
 
-fun getDatabaseImiges(db: AppDatabase): List<Image> = db.imigeDao().getAll()
+fun getDatabaseImages(db: AppDatabase): List<Image> = db.imigeDao().getAll()
 
 // Operate
 fun exceptByPath(a: List<Image>, b: List<Image>): List<Image> =
@@ -55,8 +55,8 @@ fun intersectByPath(a: List<Image>, b: List<Image>): List<Image> = //filterNotAv
 
 
 fun getPathsToRepeat(intersect: List<Image>, currDate: DateTime): List<Image> =
-    intersect.filter { imige ->
-        isImigeForToday(imige, currDate)
+    intersect.filter { image ->
+        image.isActive && isImigeForToday(image, currDate)
     }.sortedBy { it.last_modified }
 
 fun isImigeForToday(image: Image, date: DateTime): Boolean {
@@ -68,17 +68,20 @@ private fun getNextRepDate(image: Image): LocalDate {
 }
 
 // Modify operations on DB
-fun initPaths(paths: List<Image>, db: AppDatabase) =
-    paths.forEach { imige -> db.imigeDao().init(imige.path) }
+fun initPaths(image: List<Image>, db: AppDatabase) =
+    image.forEach { image -> db.imigeDao().init(image.path, image.last_modified, true) }
 
-fun repeat(path: String, db: AppDatabase) {
+fun repeat(image: Image, db: AppDatabase) {
     val imgDao = db.imigeDao()
-    val imige = imgDao.findById(path)
-    if (imige == null)
-        imgDao.init(path)
-    else if (isImigeForToday(imige, DateTime()))
-        imgDao.increment(path)
+    val imageDb = imgDao.findById(image.path)
+    if (imageDb == null)
+        imgDao.init(image.path, image.last_modified, true)
+    else if (isImigeForToday(imageDb, DateTime()))
+        imgDao.increment(imageDb.path)
 }
+
+fun disactivate(image: Image, db: AppDatabase) =
+    db.imigeDao().disactivate(image.path)
 
 class EngineOne {
 

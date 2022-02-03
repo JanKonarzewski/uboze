@@ -14,9 +14,9 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += [
-                        "room.schemaLocation":"$projectDir/schemas".toString(),
-                        "room.incremental":"true",
-                        "room.expandProjection":"true"]
+                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"]
             }
         }
         applicationId "pl.konarzewski.uboze"
@@ -49,6 +49,13 @@ android {
 apply plugin: "kotlin-kapt"
 
 dependencies {
+
+    // Google Translate
+    //implementation 'com.google.cloud:google-cloud-translate:2.1.9'
+
+    // Memonic
+    implementation 'org.apache.commons:commons-text:1.9'
+    implementation 'info.debatty:java-string-similarity:2.0.0'
 
     // Tensorflow
     def tensorflow_version = "0.3.1"

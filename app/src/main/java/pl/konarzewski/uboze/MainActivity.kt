@@ -1,7 +1,7 @@
 package pl.konarzewski.uboze
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import pl.konarzewski.uboze.database.AppDatabase
 
 class MainActivity : AppCompatActivity() {

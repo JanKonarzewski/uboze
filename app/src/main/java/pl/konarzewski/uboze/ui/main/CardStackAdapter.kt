@@ -2,16 +2,21 @@ package pl.konarzewski.uboze.ui.main
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.yuyakaido.android.cardstackview.*
 import pl.konarzewski.uboze.R
 import pl.konarzewski.uboze.database.entity.Imige
+import pl.konarzewski.uboze.ops.DoubleClickListener
 
 fun getConfiguredCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLayoutManager {
     val manager = getCardStackManager(ctx, swipe)
@@ -44,7 +49,7 @@ private fun getCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLa
             swipe(position)
     })
 
-class CardStackAdapter(private val imiges: List<Imige>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
+class CardStackAdapter(private val imiges: List<Imige>, private val viewPrim: View) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.word_item, parent, false))
@@ -63,6 +68,30 @@ class CardStackAdapter(private val imiges: List<Imige>) : RecyclerView.Adapter<C
             image = view.findViewById(R.id.image_place_holder)
             counter = view.findViewById(R.id.counter)
             repNo = view.findViewById(R.id.rep_no)
+
+            view.setOnClickListener(
+                DoubleClickListener(
+                    callback = object : DoubleClickListener.Callback {
+                        override fun doubleClicked() {
+
+                           /* val popupWindow = PopupWindow(
+                                viewPrim, // Custom view to show in popup window
+                                LinearLayout.LayoutParams.WRAP_CONTENT, // Width of popup window
+                                LinearLayout.LayoutParams.WRAP_CONTENT // Window height
+                            )
+                            popupWindow.showAtLocation(
+                                view, // Location to display popup window
+                                Gravity.CENTER, // Exact position of layout to display popup
+                                0, // X offset
+                                0 // Y offset
+                            )
+
+                            */
+                            findNavController(view).navigate(R.id.copy)
+                        }
+                    }
+                )
+            )
         }
 
         fun setData(imige: Imige) {

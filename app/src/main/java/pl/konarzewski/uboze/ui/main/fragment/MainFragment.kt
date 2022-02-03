@@ -2,16 +2,20 @@ package pl.konarzewski.uboze.ui.main.fragment
 
 import android.os.Bundle
 import android.os.Environment
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
-import com.yuyakaido.android.cardstackview.*
+import com.yuyakaido.android.cardstackview.CardStackView
 import org.joda.time.DateTime
 import pl.konarzewski.uboze.R
 import pl.konarzewski.uboze.database.AppDatabase
 import pl.konarzewski.uboze.model.*
 import pl.konarzewski.uboze.ui.main.CardStackAdapter
 import pl.konarzewski.uboze.ui.main.getConfiguredCardStackManager
+
 
 class MainFragment : Fragment() {
 
@@ -26,6 +30,8 @@ class MainFragment : Fragment() {
         val db = AppDatabase.getInstance(ctx)
         val dcimScreenshotsPath = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
         val internalFiles = getInteralFiles(dcimScreenshotsPath)
+        //val screenshotsFile: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        //val internalFiles = File(screenshotsFile, "Screenshots").listFiles()
         val internalImagesFromToday = getInteralImigesFromToday(internalFiles, currDateTime)
         val internalImagesNotFromToday = getInteralImigesNotFromToday(internalFiles, currDateTime)
         val except = exceptByPath(internalImagesFromToday, getDatabaseImiges(db))
@@ -42,7 +48,7 @@ class MainFragment : Fragment() {
             repeat(images[position].path, db)
         }
         cardStackView
-        cardStackView.adapter = CardStackAdapter(images)
+        cardStackView.adapter = CardStackAdapter(images, view)
         cardStackView.itemAnimator = DefaultItemAnimator()
     }
 
@@ -60,5 +66,18 @@ class MainFragment : Fragment() {
     override fun onDestroy() {
         AppDatabase.destroyInstance()
         super.onDestroy()
+    }
+
+    override fun onResume() {
+        requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        super.onResume()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+    }
+
+    override fun onStop() {
+        requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+        super.onStop()
+        (activity as AppCompatActivity?)!!.supportActionBar!!.show()
     }
 }

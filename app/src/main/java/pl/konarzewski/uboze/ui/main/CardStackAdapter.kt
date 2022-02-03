@@ -11,7 +11,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.yuyakaido.android.cardstackview.*
 import pl.konarzewski.uboze.R
+import pl.konarzewski.uboze.database.AppDatabase
 import pl.konarzewski.uboze.database.entity.Image
+import pl.konarzewski.uboze.model.disactivate
+import pl.konarzewski.uboze.ops.DoubleClickListener
 
 fun getConfiguredCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLayoutManager {
     val manager = getCardStackManager(ctx, swipe)
@@ -44,7 +47,7 @@ private fun getCardStackManager(ctx: Context, swipe: (Int) -> Unit): CardStackLa
             swipe(position)
     })
 
-class CardStackAdapter(private val images: List<Image>) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
+class CardStackAdapter(private val images: List<Image>, private val db: AppDatabase) : RecyclerView.Adapter<CardStackAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.word_item, parent, false))
@@ -58,14 +61,26 @@ class CardStackAdapter(private val images: List<Image>) : RecyclerView.Adapter<C
         var image: ImageView
         var counter: TextView
         var repNo: TextView
+        lateinit var imageValue: Image
 
         init {
             image = view.findViewById(R.id.image_place_holder)
             counter = view.findViewById(R.id.counter)
             repNo = view.findViewById(R.id.rep_no)
+
+            view.setOnClickListener(
+                DoubleClickListener(
+                    callback = object : DoubleClickListener.Callback {
+                        override fun doubleClicked() {
+                            disactivate(imageValue, db)
+                        }
+                    }
+                )
+            )
         }
 
         fun setData(image: Image) {
+            imageValue = image
             this.image.setImageBitmap(BitmapFactory.decodeFile(image.path))
             counter.text = (images.size - adapterPosition).toString()
             repNo.text = (image.rep_no?.plus(1)).toString()

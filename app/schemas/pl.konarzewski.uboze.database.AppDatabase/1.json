@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0cf3d507ad900057cc61bf123db534d5",
+    "identityHash": "1418f77e35c4bd5bf763872eb77235c0",
     "entities": [
       {
         "tableName": "Image",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`path` TEXT NOT NULL, `repetition_number` INTEGER, `last_repetition_date` INTEGER, `last_modified` INTEGER, PRIMARY KEY(`path`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`path` TEXT NOT NULL, `repetition_number` INTEGER, `last_repetition_date` INTEGER, `last_modified` INTEGER NOT NULL, `is_active` INTEGER NOT NULL, PRIMARY KEY(`path`))",
         "fields": [
           {
             "fieldPath": "path",
@@ -30,7 +30,13 @@
             "fieldPath": "last_modified",
             "columnName": "last_modified",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "is_active",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -46,7 +52,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0cf3d507ad900057cc61bf123db534d5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1418f77e35c4bd5bf763872eb77235c0')"
     ]
   }
 }

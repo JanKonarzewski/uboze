@@ -27,20 +27,20 @@ class MainFragment : Fragment() {
         val dcimScreenshotsPath = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
         val internalImages = getInteralImiges(dcimScreenshotsPath)
         val internalImagesFromToday = getInteralImigesFromToday(internalImages, currDateTime)
-        val except = exceptByPath(internalImagesFromToday, getDatabaseImiges(db))
+        val except = exceptByPath(internalImagesFromToday, getDatabaseImages(db))
 
         initPaths(except, db)
 
-        val databaseImages = getDatabaseImiges(db)
+        val databaseImages = getDatabaseImages(db)
         val intersect = intersectByPath(databaseImages, internalImages)
         val images = getPathsToRepeat(intersect, currDateTime)
 
         cardStackView = view.findViewById(R.id.card_stack_view)
         cardStackView.layoutManager = getConfiguredCardStackManager(ctx) { position ->
-            repeat(images[position].path, db)
+            repeat(images[position], db)
         }
         cardStackView
-        cardStackView.adapter = CardStackAdapter(images)
+        cardStackView.adapter = CardStackAdapter(images, db)
         cardStackView.itemAnimator = DefaultItemAnimator()
     }
 

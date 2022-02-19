@@ -28,9 +28,13 @@ fun getInteralImiges(path: String): List<Image> =
         .listFiles()
         .map { file -> Image(file.path, null, null, file.lastModified(), false) }
 
-fun getInteralImigesFromToday(images: List<Image>, currDate: DateTime): List<Image> =
+fun getInteralImigesFromDate(images: List<Image>, date: DateTime): List<Image> =
     images
-        .filter { image -> DateTime(image.last_modified).shiftToDate() == currDate.shiftToDate() }
+        .filter { image -> DateTime(image.last_modified).shiftToDate() == date.shiftToDate() }
+
+fun getInteralImigesBeginningFromDate(images: List<Image>, date: DateTime): List<Image> =
+    images
+        .filter { image -> DateTime(image.last_modified).shiftToDate() >= date.shiftToDate() }
 
 fun getInteralImigesNotFromToday(images: List<Image>, currDate: DateTime): List<Image> =
     images

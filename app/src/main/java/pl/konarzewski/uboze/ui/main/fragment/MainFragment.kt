@@ -26,7 +26,7 @@ class MainFragment : Fragment() {
         val db = AppDatabase.getInstance(ctx)
         val dcimScreenshotsPath = Environment.getExternalStorageDirectory().toString() + "/DCIM/Screenshots"
         val internalImages = getInteralImiges(dcimScreenshotsPath)
-        val internalImagesFromToday = getInteralImigesFromToday(internalImages, currDateTime)
+        val internalImagesFromToday = getInteralImigesBeginningFromDate(internalImages, DateTime("2022-02-03"))
         val except = exceptByPath(internalImagesFromToday, getDatabaseImages(db))
 
         initPaths(except, db)

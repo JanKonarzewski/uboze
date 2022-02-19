@@ -72,6 +72,7 @@ class CardStackAdapter(private val images: List<Image>, private val db: AppDatab
                 DoubleClickListener(
                     callback = object : DoubleClickListener.Callback {
                         override fun doubleClicked() {
+                            image.setImageBitmap(null)
                             disactivate(imageValue, db)
                         }
                     }

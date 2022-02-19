@@ -3,7 +3,7 @@ package pl.konarzewski.uboze.ops
 import android.view.View
 
 class DoubleClickListener(
-    private val doubleClickTimeLimitMills: Long = 1000,
+    private val doubleClickTimeLimitMills: Long = 500,
     private val callback: Callback
 ) :
     View.OnClickListener {
